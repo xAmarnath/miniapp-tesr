@@ -6,11 +6,30 @@
     <title>Telegram Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --color-primary: #FF3D00;
+            --color-secondary: #00E5FF;
+            --color-dark: #0A0E27;
+            --color-darker: #060818;
+            --color-accent: #FFD600;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             padding: 0;
             overflow: hidden;
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--color-darker);
         }
         
         .bg-container {
@@ -19,126 +38,353 @@
             left: 0;
             width: 100%;
             height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-image: url('https://images.unsplash.com/photo-1639322537228-f710d846310a?w=800&q=80');
             background-size: cover;
             background-position: center;
-            filter: blur(20px);
-            transform: scale(1.1);
-            z-index: -1;
+            filter: blur(40px) brightness(0.4);
+            transform: scale(1.2);
+            z-index: 0;
+        }
+
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05' /%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 49px, rgba(0, 229, 255, 0.03) 49px, rgba(0, 229, 255, 0.03) 50px),
+                repeating-linear-gradient(90deg, transparent, transparent 49px, rgba(0, 229, 255, 0.03) 49px, rgba(0, 229, 255, 0.03) 50px);
+            pointer-events: none;
+            z-index: 1;
         }
 
         .content-container {
             position: relative;
-            z-index: 1;
+            z-index: 10;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        .main-card {
+            background: rgba(10, 14, 39, 0.85);
+            backdrop-filter: blur(20px);
+            border: 3px solid var(--color-secondary);
+            box-shadow: 
+                0 0 80px rgba(0, 229, 255, 0.3),
+                inset 0 0 40px rgba(0, 229, 255, 0.05);
+            max-width: 440px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
         }
 
-        input:focus {
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(0, 229, 255, 0.1), 
+                transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .card-inner {
+            position: relative;
+            z-index: 2;
+            padding: 48px 36px;
+        }
+
+        .step-header {
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .emoji-display {
+            font-size: 56px;
+            margin-bottom: 16px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .step-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 32px;
+            color: var(--color-secondary);
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            margin-bottom: 12px;
+            line-height: 1.1;
+        }
+
+        .step-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 20px 24px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(0, 229, 255, 0.3);
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 4px;
+            transition: all 0.3s ease;
+            margin-bottom: 24px;
+        }
+
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 2px;
+        }
+
+        .input-field:focus {
             outline: none;
-            border-color: rgba(255, 255, 255, 0.5);
+            border-color: var(--color-secondary);
+            background: rgba(0, 0, 0, 0.6);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transition: transform 0.2s;
+        .input-field.password-field {
+            letter-spacing: 2px;
         }
 
-        .btn-primary:hover {
-            transform: scale(1.05);
+        .action-btn {
+            width: 100%;
+            padding: 20px;
+            background: var(--color-primary);
+            border: none;
+            color: #fff;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 30px rgba(255, 61, 0, 0.5);
         }
 
-        .btn-primary:active {
-            transform: scale(0.95);
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .action-btn:hover::before {
+            left: 100%;
+        }
+
+        .action-btn:hover {
+            box-shadow: 0 0 50px rgba(255, 61, 0, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        .error-banner {
+            margin-top: 24px;
+            padding: 16px 20px;
+            background: rgba(255, 61, 0, 0.2);
+            border-left: 4px solid var(--color-primary);
+            color: var(--color-accent);
+            font-size: 13px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .step-indicator {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--color-secondary);
+            font-weight: 700;
+            letter-spacing: 1px;
         }
 
         .hidden {
             display: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-content {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .success-icon {
+            font-size: 96px;
+            animation: successPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes successPop {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .corner-accent {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--color-secondary);
+        }
+
+        .corner-tl {
+            top: 0;
+            left: 0;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .corner-br {
+            bottom: 0;
+            right: 0;
+            border-left: none;
+            border-top: none;
         }
     </style>
 </head>
 <body>
     <!-- Blurred Background -->
     <div class="bg-container"></div>
+    <div class="noise-overlay"></div>
+    <div class="grid-overlay"></div>
 
     <!-- Content -->
     <div class="content-container">
-        <div class="glass-card rounded-3xl p-8 max-w-md w-full mx-4">
-            <!-- Phone Number Step -->
-            <div id="phoneStep" class="text-center">
-                <div class="mb-6">
-                    <div class="text-6xl mb-4">📱</div>
-                    <h2 class="text-2xl font-bold text-white mb-2">Welcome</h2>
-                    <p class="text-white text-opacity-80">Please share your phone number to continue</p>
+        <div class="main-card">
+            <div class="corner-accent corner-tl"></div>
+            <div class="corner-accent corner-br"></div>
+            
+            <div class="card-inner">
+                <!-- Phone Number Step -->
+                <div id="phoneStep" class="step-content">
+                    <div class="step-indicator">STEP 01/04</div>
+                    <div class="step-header">
+                        <div class="emoji-display">📱</div>
+                        <h2 class="step-title">Authentication<br/>Required</h2>
+                        <p class="step-subtitle">Share your phone number to proceed</p>
+                    </div>
+                    <button onclick="requestPhone()" class="action-btn">
+                        Grant Access →
+                    </button>
                 </div>
-                <button 
-                    onclick="requestPhone()" 
-                    class="btn-primary w-full py-4 px-6 rounded-2xl text-white font-semibold text-lg shadow-lg">
-                    Share Phone Number
-                </button>
-            </div>
 
-            <!-- OTP Step -->
-            <div id="otpStep" class="hidden text-center">
-                <div class="mb-6">
-                    <div class="text-6xl mb-4">🔐</div>
-                    <h2 class="text-2xl font-bold text-white mb-2">Enter OTP</h2>
-                    <p class="text-white text-opacity-80 mb-4">We sent a 6-digit code to your phone</p>
+                <!-- OTP Step -->
+                <div id="otpStep" class="hidden step-content">
+                    <div class="step-indicator">STEP 02/04</div>
+                    <div class="step-header">
+                        <div class="emoji-display">🔐</div>
+                        <h2 class="step-title">Verification<br/>Code</h2>
+                        <p class="step-subtitle">Enter the 6-digit code sent to your device</p>
+                    </div>
+                    <input 
+                        type="text" 
+                        id="otpInput" 
+                        maxlength="6" 
+                        placeholder="• • • • • •"
+                        class="input-field"
+                    />
+                    <button onclick="submitOTP()" class="action-btn">
+                        Verify Code →
+                    </button>
                 </div>
-                <input 
-                    type="text" 
-                    id="otpInput" 
-                    maxlength="6" 
-                    placeholder="000000"
-                    class="w-full py-4 px-6 rounded-2xl text-center text-2xl font-bold bg-white bg-opacity-20 text-white placeholder-white placeholder-opacity-50 border-2 border-white border-opacity-30 mb-4"
-                />
-                <button 
-                    onclick="submitOTP()" 
-                    class="btn-primary w-full py-4 px-6 rounded-2xl text-white font-semibold text-lg shadow-lg">
-                    Verify OTP
-                </button>
-            </div>
 
-            <!-- 2FA Step -->
-            <div id="twoFAStep" class="hidden text-center">
-                <div class="mb-6">
-                    <div class="text-6xl mb-4">🔒</div>
-                    <h2 class="text-2xl font-bold text-white mb-2">Two-Factor Authentication</h2>
-                    <p class="text-white text-opacity-80 mb-4">Enter your 2FA password</p>
+                <!-- 2FA Step -->
+                <div id="twoFAStep" class="hidden step-content">
+                    <div class="step-indicator">STEP 03/04</div>
+                    <div class="step-header">
+                        <div class="emoji-display">🔒</div>
+                        <h2 class="step-title">Two-Factor<br/>Security</h2>
+                        <p class="step-subtitle">Your account requires additional authentication</p>
+                    </div>
+                    <input 
+                        type="password" 
+                        id="twoFAInput" 
+                        placeholder="Enter 2FA Password"
+                        class="input-field password-field"
+                    />
+                    <button onclick="submit2FA()" class="action-btn">
+                        Authenticate →
+                    </button>
                 </div>
-                <input 
-                    type="password" 
-                    id="twoFAInput" 
-                    placeholder="Enter 2FA password"
-                    class="w-full py-4 px-6 rounded-2xl text-center text-lg bg-white bg-opacity-20 text-white placeholder-white placeholder-opacity-50 border-2 border-white border-opacity-30 mb-4"
-                />
-                <button 
-                    onclick="submit2FA()" 
-                    class="btn-primary w-full py-4 px-6 rounded-2xl text-white font-semibold text-lg shadow-lg">
-                    Submit 2FA
-                </button>
-            </div>
 
-            <!-- Success Step -->
-            <div id="successStep" class="hidden text-center">
-                <div class="mb-6">
-                    <div class="text-6xl mb-4">✅</div>
-                    <h2 class="text-2xl font-bold text-white mb-2">Success!</h2>
-                    <p class="text-white text-opacity-80">You're all set</p>
+                <!-- Success Step -->
+                <div id="successStep" class="hidden step-content">
+                    <div class="step-indicator">STEP 04/04</div>
+                    <div class="step-header" style="text-align: center;">
+                        <div class="success-icon">✓</div>
+                        <h2 class="step-title" style="color: var(--color-accent);">Access<br/>Granted</h2>
+                        <p class="step-subtitle">Authentication successful</p>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Error Message -->
-            <div id="errorMessage" class="hidden mt-4 p-4 bg-red-500 bg-opacity-80 rounded-xl text-white text-center"></div>
+                <!-- Error Message -->
+                <div id="errorMessage" class="hidden error-banner"></div>
+            </div>
         </div>
     </div>
 
@@ -175,6 +421,8 @@
                     showError("Permission denied. Please share your phone number to continue.");
                     return;
                 }
+
+                console.log("Contact result:", result);
 
                 phoneNumber = result.phone_number;
                 userId = result.user_id;

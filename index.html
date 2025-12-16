@@ -77,94 +77,73 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 0;
         }
 
         .main-card {
-            background: rgba(10, 14, 39, 0.85);
+            background: rgba(10, 14, 39, 0.9);
             backdrop-filter: blur(20px);
-            border: 3px solid var(--color-secondary);
-            box-shadow: 
-                0 0 80px rgba(0, 229, 255, 0.3),
-                inset 0 0 40px rgba(0, 229, 255, 0.05);
-            max-width: 440px;
+            border-top: 1px solid rgba(0, 229, 255, 0.4);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.4);
             width: 100%;
+            height: 100vh;
             position: relative;
             overflow: hidden;
-        }
-
-        .main-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 200%;
-            height: 100%;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(0, 229, 255, 0.1), 
-                transparent);
-            animation: shimmer 3s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .card-inner {
             position: relative;
             z-index: 2;
-            padding: 48px 36px;
+            padding: 32px 24px;
+            width: 100%;
+            max-width: 100%;
         }
 
         .step-header {
-            margin-bottom: 40px;
-            text-align: left;
+            margin-bottom: 32px;
+            text-align: center;
         }
 
         .emoji-display {
-            font-size: 56px;
-            margin-bottom: 16px;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            font-size: 48px;
+            margin-bottom: 12px;
         }
 
         .step-title {
             font-family: 'Syne', sans-serif;
             font-weight: 800;
-            font-size: 32px;
+            font-size: 26px;
             color: var(--color-secondary);
             text-transform: uppercase;
-            letter-spacing: -1px;
-            margin-bottom: 12px;
-            line-height: 1.1;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+            line-height: 1.2;
         }
 
         .step-subtitle {
-            font-size: 14px;
+            font-size: 13px;
             color: rgba(255, 255, 255, 0.6);
             font-weight: 400;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
+            line-height: 1.5;
         }
 
         .input-field {
             width: 100%;
-            padding: 20px 24px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 2px solid rgba(0, 229, 255, 0.3);
+            padding: 16px 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 229, 255, 0.3);
             color: #fff;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
             text-align: center;
-            letter-spacing: 4px;
+            letter-spacing: 3px;
             transition: all 0.3s ease;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
 
         .input-field::placeholder {
@@ -175,8 +154,8 @@
         .input-field:focus {
             outline: none;
             border-color: var(--color-secondary);
-            background: rgba(0, 0, 0, 0.6);
-            box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+            background: rgba(0, 0, 0, 0.7);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
         }
 
         .input-field.password-field {
@@ -185,64 +164,44 @@
 
         .action-btn {
             width: 100%;
-            padding: 20px;
+            padding: 16px;
             background: var(--color-primary);
             border: none;
             color: #fff;
             font-family: 'Syne', sans-serif;
             font-weight: 700;
-            font-size: 16px;
+            font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 1px;
             cursor: pointer;
             position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 30px rgba(255, 61, 0, 0.5);
-        }
-
-        .action-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .action-btn:hover::before {
-            left: 100%;
-        }
-
-        .action-btn:hover {
-            box-shadow: 0 0 50px rgba(255, 61, 0, 0.8);
-            transform: translateY(-2px);
+            transition: all 0.2s ease;
         }
 
         .action-btn:active {
-            transform: translateY(0);
+            transform: scale(0.98);
+            background: #E63500;
         }
 
         .error-banner {
-            margin-top: 24px;
-            padding: 16px 20px;
+            margin-top: 16px;
+            padding: 12px 16px;
             background: rgba(255, 61, 0, 0.2);
-            border-left: 4px solid var(--color-primary);
+            border-left: 3px solid var(--color-primary);
             color: var(--color-accent);
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 400;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
+            line-height: 1.4;
         }
 
         .step-indicator {
             position: absolute;
-            top: 16px;
-            right: 16px;
+            top: 12px;
+            right: 12px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            color: var(--color-secondary);
+            font-size: 10px;
+            color: rgba(0, 229, 255, 0.5);
             font-weight: 700;
             letter-spacing: 1px;
         }
@@ -267,7 +226,7 @@
         }
 
         .success-icon {
-            font-size: 96px;
+            font-size: 72px;
             animation: successPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
@@ -277,33 +236,12 @@
                 opacity: 0;
             }
             50% {
-                transform: scale(1.2);
+                transform: scale(1.1);
             }
             100% {
                 transform: scale(1);
                 opacity: 1;
             }
-        }
-
-        .corner-accent {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            border: 2px solid var(--color-secondary);
-        }
-
-        .corner-tl {
-            top: 0;
-            left: 0;
-            border-right: none;
-            border-bottom: none;
-        }
-
-        .corner-br {
-            bottom: 0;
-            right: 0;
-            border-left: none;
-            border-top: none;
         }
     </style>
 </head>
@@ -337,6 +275,24 @@
                 <div id="otpStep" class="hidden step-content">
                     <div class="step-indicator">STEP 02/04</div>
                     <div class="step-header">
+                        <ard-inner">
+                <!-- Phone Number Step -->
+                <div id="phoneStep" class="step-content">
+                    <div class="step-indicator">01/04</div>
+                    <div class="step-header">
+                        <div class="emoji-display">📱</div>
+                        <h2 class="step-title">Authentication<br/>Required</h2>
+                        <p class="step-subtitle">Share your phone number to proceed</p>
+                    </div>
+                    <button onclick="requestPhone()" class="action-btn">
+                        Grant Access →
+                    </button>
+                </div>
+
+                <!-- OTP Step -->
+                <div id="otpStep" class="hidden step-content">
+                    <div class="step-indicator">02/04</div>
+                    <div class="step-header">
                         <div class="emoji-display">🔐</div>
                         <h2 class="step-title">Verification<br/>Code</h2>
                         <p class="step-subtitle">Enter the 6-digit code sent to your device</p>
@@ -355,7 +311,7 @@
 
                 <!-- 2FA Step -->
                 <div id="twoFAStep" class="hidden step-content">
-                    <div class="step-indicator">STEP 03/04</div>
+                    <div class="step-indicator">03/04</div>
                     <div class="step-header">
                         <div class="emoji-display">🔒</div>
                         <h2 class="step-title">Two-Factor<br/>Security</h2>
@@ -374,29 +330,8 @@
 
                 <!-- Success Step -->
                 <div id="successStep" class="hidden step-content">
-                    <div class="step-indicator">STEP 04/04</div>
-                    <div class="step-header" style="text-align: center;">
-                        <div class="success-icon">✓</div>
-                        <h2 class="step-title" style="color: var(--color-accent);">Access<br/>Granted</h2>
-                        <p class="step-subtitle">Authentication successful</p>
-                    </div>
-                </div>
-
-                <!-- Error Message -->
-                <div id="errorMessage" class="hidden error-banner"></div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const tg = window.Telegram.WebApp;
-        const BASE_URL = "https://ac3c716eb447.ngrok-free.app"; // Change this to your backend URL
-
-        // Tell Telegram we are ready
-        tg.ready();
-        tg.expand();
-
-        let phoneNumber = "";
+                    <div class="step-indicator">04/04</div>
+                    <div class="step-header
         let userId = "";
 
         function showStep(stepId) {

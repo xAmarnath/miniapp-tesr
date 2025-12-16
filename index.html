@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Telegram Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+
+<h2>Telegram Mini App</h2>
+
+<button onclick="requestPhone()">📱 Share phone number</button>
+
+<script>
+const tg = window.Telegram.WebApp;
+
+// Tell Telegram we are ready
+tg.ready();
+
+// Optional UI tweaks
+tg.expand();
+tg.MainButton.hide();
+
+function requestPhone() {
+    tg.requestContact((result) => {
+        if (!result) {
+            alert("Permission denied");
+            return;
+        }
+
+        console.log(result);
+        alert("Phone: " + result.phone_number);
+
+        // send to backend
+        fetch("/api/phone", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                phone: result.phone_number,
+                user_id: result.user_id,
+                initData: tg.initData
+            })
+        });
+    });
+}
+</script>
+
+</body>
+</html>

